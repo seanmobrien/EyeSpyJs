@@ -16,6 +16,9 @@
 # Mono auto generated files
 mono_crash.*
 
+# Private Resources
+[Rr]es/\.[Pp]rivate/
+
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
