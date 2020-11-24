@@ -57,6 +57,9 @@
     <Folder Include="views\" />
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="ms-vision\ifaces.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="ms-vision\enums.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
