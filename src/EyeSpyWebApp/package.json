@@ -30,6 +30,6 @@
     "@types/node": "^8.0.14",
     "@types/serve-static": "^1.7.32",
     "cors": "^2.8.5",
-    "typescript": "^3.2.2"
+    "typescript": "^3.9.7"
   }
 }
