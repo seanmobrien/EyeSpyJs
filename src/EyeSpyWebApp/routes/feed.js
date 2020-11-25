@@ -1,16 +1,17 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 /*
  * POST image feed.
  */
+Object.defineProperty(exports, "__esModule", { value: true });
 const express = require("express");
-const debug = require("debug");
-const ms_vision_1 = require("../ms-vision/");
+const debugFactory = require("debug");
+const debug = debugFactory('feed');
+const msVis = require("../ms-vision/");
 const router = express.Router();
 function passThroughService(req, res, callService) {
     const files = req['files'];
     if (!files || Object.keys(files).length === 0) {
-        res.send({
+        res.json({
             status: false,
             message: 'No file uploaded'
         });
@@ -31,7 +32,10 @@ function passThroughService(req, res, callService) {
             // Pass to callService callback
             return callService({ data: frame.data })
                 // Process fail by default
-                .catch((err) => { res.status(err.statusCode).send(err); });
+                .catch((err) => {
+                debug('An unexpected failure occurred while processing a pass-through service request.', err);
+                res.status(err.statusCode).send(err);
+            });
         }
     }
 }
@@ -40,28 +44,28 @@ router.get('/', (req, res) => {
 });
 router.post('/frame', (req, res) => {
     passThroughService(req, res, (r) => {
-        return ms_vision_1.analyzeImage({
+        return msVis.analyzeImage({
             data: r.data,
             visualFeatures: [
-                ms_vision_1.VisualFeature.Categories,
-                ms_vision_1.VisualFeature.Description,
-                ms_vision_1.VisualFeature.Objects,
-                ms_vision_1.VisualFeature.Faces
+                msVis.VisualFeature.Categories,
+                msVis.VisualFeature.Description,
+                msVis.VisualFeature.Objects,
+                msVis.VisualFeature.Faces
             ]
         });
     }).then((result) => {
-        res.send({
+        res.json({
             status: true,
             message: 'Successfully scraped frame',
             data: result
         });
     }).catch((err) => {
-        debug("error!" + err);
+        debug("error!", err);
     });
 });
 router.post('/detect', (req, res) => {
-    passThroughService(req, res, ms_vision_1.detectObjects).then((result) => {
-        res.send({
+    passThroughService(req, res, msVis.detectObjects).then((result) => {
+        res.json({
             status: true,
             message: 'Successfully scraped frame',
             data: result
@@ -70,41 +74,41 @@ router.post('/detect', (req, res) => {
 });
 router.post('/describe', (req, res) => {
     passThroughService(req, res, (r) => {
-        return ms_vision_1.describeImage({
+        return msVis.describeImage({
             data: r.data,
             maxCandidates: 3
         });
     }).then((result) => {
-        res.send({
+        res.json({
             status: true,
             message: 'Successfully scraped frame',
             data: result
         });
     }).catch((err) => {
-        debug("error!" + err);
+        debug("error!", err);
     });
 });
 router.post('/area-of-interest', (req, res) => {
-    passThroughService(req, res, ms_vision_1.areaOfInterest)
+    passThroughService(req, res, msVis.areaOfInterest)
         .then((result) => {
-        res.send({
+        res.json({
             status: true,
             message: 'Successfully scraped frame',
             data: result
         });
     }).catch((err) => {
-        debug("error!" + err);
+        debug("error!", err);
     });
 });
 router.post('/tag', (req, res) => {
-    passThroughService(req, res, ms_vision_1.tagImage).then((result) => {
-        res.send({
+    passThroughService(req, res, msVis.tagImage).then((result) => {
+        res.json({
             status: true,
             message: 'Successfully scraped frame',
             data: result
         });
     }).catch((err) => {
-        debug("error!" + err);
+        debug("error!", err);
     });
 });
 exports.default = router;

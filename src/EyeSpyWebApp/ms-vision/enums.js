@@ -24,15 +24,23 @@ var ContentType;
  */
 var VisualFeature;
 (function (VisualFeature) {
-    /** @var */
+    /** Adult Content Detection */
     VisualFeature["Adult"] = "Adult";
+    /** Brand Detection */
     VisualFeature["Brands"] = "Brands";
+    /** Categorization */
     VisualFeature["Categories"] = "Categories";
+    /** Color classification */
     VisualFeature["Color"] = "Color";
+    /** Image Description */
     VisualFeature["Description"] = "Description";
+    /** Face detection  */
     VisualFeature["Faces"] = "Faces";
+    /** Image Type Detection  */
     VisualFeature["ImageType"] = "ImageType";
+    /** Object Detection  */
     VisualFeature["Objects"] = "Objects";
+    /** Image tagging  */
     VisualFeature["Tags"] = "Tags";
 })(VisualFeature = exports.VisualFeature || (exports.VisualFeature = {}));
 /**
@@ -41,10 +49,15 @@ var VisualFeature;
  */
 var Language;
 (function (Language) {
+    /** English */
     Language["English"] = "en";
+    /** Spanish */
     Language["Spanish"] = "es";
+    /** Japanese */
     Language["Japanese"] = "ja";
+    /** Portuguese */
     Language["Portuguese"] = "pt";
+    /** SimplifiedChinese */
     Language["SimplifiedChinese"] = "zh";
 })(Language = exports.Language || (exports.Language = {}));
 /**
@@ -53,7 +66,9 @@ var Language;
  */
 var AnalyzeDetail;
 (function (AnalyzeDetail) {
+    /** Celebrity  */
     AnalyzeDetail["Celebrities"] = "Celebrities";
+    /** Landmark */
     AnalyzeDetail["Landmarks"] = "Landmarks";
 })(AnalyzeDetail = exports.AnalyzeDetail || (exports.AnalyzeDetail = {}));
 /**
@@ -62,9 +77,13 @@ var AnalyzeDetail;
  */
 var ClipartType;
 (function (ClipartType) {
+    /** Not clip art */
     ClipartType[ClipartType["NonClipart"] = 0] = "NonClipart";
+    /** Unable to determine */
     ClipartType[ClipartType["Ambiguous"] = 1] = "Ambiguous";
+    /** Passable as clip art */
     ClipartType[ClipartType["Normal"] = 2] = "Normal";
+    /** High-quality clip art */
     ClipartType[ClipartType["Good"] = 3] = "Good";
 })(ClipartType = exports.ClipartType || (exports.ClipartType = {}));
 /**
@@ -73,7 +92,9 @@ var ClipartType;
  */
 var LineDrawingType;
 (function (LineDrawingType) {
+    /** Image is not a line drawing */
     LineDrawingType[LineDrawingType["NonLineDrawing"] = 0] = "NonLineDrawing";
+    /** Image is a line drawing */
     LineDrawingType[LineDrawingType["LineDrawing"] = 1] = "LineDrawing";
 })(LineDrawingType = exports.LineDrawingType || (exports.LineDrawingType = {}));
 //# sourceMappingURL=enums.js.map

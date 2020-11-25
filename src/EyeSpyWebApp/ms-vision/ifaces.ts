@@ -1,5 +1,4 @@
-import { VisualFeature, AnalyzeDetail, Language, HttpHeader, ContentType } from './enums';
-
+import * as visEnums from './enums';
 
 /**
  * Interface shared by tagged data.
@@ -64,16 +63,31 @@ export interface IRect {
 }
 
 
-/** @interface IImageCategory<TDetail> contains an abstract image category result. */
+/**
+ * Image category envelope.
+ * @interface
+ */
 export interface IImageCategory<TDetail> {
-    /** @var {string} name Category Name */
+    /**
+     * The name of this category.
+     * @var {string}
+     */
     name: string;
-    /** @var {number} score Probability for this category */
+    /**
+     * The probability assigned to this category.
+     * @var {number}
+     */
     score: number;
-    /** @var {TDetail} category detail */
+    /**
+     * Detail data object.
+     * @var {TDetail}
+     */
     detail?: TDetail;
 }
-
+/**
+ * Describes a celebrity detected within an image.
+ * @interface
+ */
 export interface IImageCelebrity extends IImageTag {
     /**
      * Rectangle containing celebrity face.
@@ -81,10 +95,13 @@ export interface IImageCelebrity extends IImageTag {
      */
     faceRectangle: IRectangle;
 }
-/** @interface IImageCategoryDetailPeoplePortrait contains people portrait category data. */
+/**
+ * Contains people portrait category data.
+ * @interface
+ */
 export interface IImageCategoryDetailPeoplePortrait {
     /**
-     * Recognized faces
+     * Recognized people.
      * @var {IImageCelebrity[]}
      */
     celebrities: IImageCelebrity[];
@@ -96,17 +113,17 @@ export interface IImageCategoryDetailPeoplePortrait {
 }
 
 /**
- * Basic image metadata
- * @interface IAnalyzeImageResponseData
+ * Basic image metadata.
+ * @interface 
  */
 export interface IImageMetadata {
     /**
-     * The image width
+     * The image width.
      * @var {number}
      */
     width: number;
     /**
-     * The image height
+     * The image height.
      * @var {number}
      */
     height: number;
@@ -134,14 +151,19 @@ export interface IDetectedObjectBase {
     confidence: number;
 }
 
-
+/**
+ * Describes an object detected within an image.
+ * @interface
+ */
 export interface IDetectedObject extends IDetectedObjectBase {
     /**
-     * @var {IRect} rectangle The bounding rectangle the object was detected within.
+     * The bounding rectangle the object was detected within.
+     * @var {IRect} 
      */
     rectangle: IRect;
     /**
-     * @var {IDetectedObjectBase} parent Optional parent to this object.
+     * Optional detected parent to this object.
+     * @var {IDetectedObjectBase} 
      */
     parent?: IDetectedObjectBase;
 }
@@ -166,25 +188,42 @@ export interface IDetectedFace {
      */
     faceRectangle: IRectangle;
 }
-/** 
- * @interface IImageDescription IDetectedFace interface is used to describe an image.
+/**
+ * Contains image description analysis response.
+ * @interface 
  */
 export interface IImageDescription {
-  /** @var {string[]} tags Array of tags describing the image */
+  /**
+   * Array of tags describing the image.
+   * @var {string[]}
+   */
   tags?: string[];
-  /** @var {IImageCaption} Image captions */
+  /**
+   * Image Captions.
+   * @var { { text: string, confidence: number} }
+   */
   captions?: {
-    /** @var {string} text Caption text */
+    /**
+     * Caption text.
+     * @var {string}
+     */
     text: string;
-    /** @var {confidence} score Probability this caption is applicable */
+    /**
+     * Probability the caption is applicable to the image.
+     * @var {number}
+     */
     confidence: number;
   }[];
 }
 
 
+/**
+ * Contains properties shared by all cognitive responses.
+ * @interface
+ */
 export interface ICongnitiveResponseData {
-  /**
- * Metadata describing the source image.
+ /**
+ *  Metadata describing the source image.
  * @var {IImageMetadata}
  */
   metadata?: IImageMetadata;
@@ -197,7 +236,7 @@ export interface ICongnitiveResponseData {
 
 
 /**
- * Interface describing detectObjects return value.
+ * Return type of detectObjects function.
  * @interface
  */
 export interface IDetectObjectsResponseData extends ICongnitiveResponseData {
@@ -209,51 +248,65 @@ export interface IDetectObjectsResponseData extends ICongnitiveResponseData {
     objects?: IDetectedObject[];
 
 }
-/** @interface IDescribeImageResponseData Describe image API response. */
+/**
+ * IDescribeImageResponseData Describe image API response.
+ * @interface
+ */
 export interface IDescribeImageResponseData extends ICongnitiveResponseData {
   /**
-   * @var description Description of the image.
+   * Description of the image.
+   * @var {IImageDescription} 
    */
   description: IImageDescription;
 }
+
+/**
+ * Describes adult image detection attributes.
+ * @interface
+ */
+export interface IAdultImageDetectionDetail {
+    /**
+     * If this is adult content.
+     * @var {boolean}
+     */
+    isAdultContent: boolean;
+    /**
+     * If this is racy content.
+     * @var {boolean}
+     */
+    isRacyContent: boolean;
+    /**
+     * If this is gory content.
+     * @var {boolean}
+     */
+    isGoryContent: boolean;
+    /**
+     * Probability the image contains adult content.
+     * @var {number}
+     */
+    adultScore: number;
+    /**
+     * Probability the image contains racy content.
+     * @var {number}
+     */
+    racyScore: number;
+    /**
+     * Probability the image contains gorey content.
+     * @var {number}
+     */
+    goreScore: number;
+}
+
 /**
  * Interface describing analyzeImage return value.
- * @interface IAnalyzeImageResponseData
+ * @interface 
  */
 export interface IAnalyzeImageResponseData extends IDetectObjectsResponseData {
-    /** Adult content @var {any} */
-    adult?: {
-        /**
-         * If this is adult content
-         * @var {boolean}
-         */
-        isAdultContent: boolean;
-        /**
-         * If this is racy content
-         * @var {boolean}
-         */
-        isRacyContent: boolean;
-        /**
-         * If this is gory content
-         * @var {boolean}
-         */
-        isGoryContent: boolean;
-        /**
-         * Probability the image contains adult content
-         * @var {number}
-         */
-        adultScore: number;
-        /**
-         * Probability the image contains racy content
-         * @var {number}
-         */
-        racyScore: number;
-        /**
-         * Probability the image contains gorey content
-         * @var {number}
-         */
-        goreScore: number;
-    };
+    /**
+     * Adult content
+     * @var {IAdultImageDetectionDetail}
+     */
+    adult?: IAdultImageDetectionDetail;
     /**
      * Array of categories that can be assigned to the image.
      * @var {IImageCategory<any>[]}
@@ -293,60 +346,86 @@ export interface IAnalyzeImageResponseData extends IDetectObjectsResponseData {
     faces?: IDetectedFace[];
 }
 
-/**@interface ICongnitiveRequest Common properties shared by all cognitive requests */
-export interface ICongnitiveRequest {
-  /**  
-  * @var {number[]} data binary image data.
+/**
+ * Common properties shared by all cognitive requests.
+ * @interface
+ */
+export interface ICognitiveRequest {
+  /**
+  * Array of bytes containing the binary image.
+  * @var {Uint8Array}
   */
-  data: number[];
+  data: Uint8Array;
 }
 
-/**@interface ICongnitiveRequest Request sent to analyze image requests */
-export interface IDescribeImageRequest extends ICongnitiveRequest {
+/**
+ * Options that can be passed to the Describe Image operation.
+ * @interface
+ */
+export interface IDescribeImageRequest extends ICognitiveRequest {
   /**
-   * @var {number} maxCandidates Maximum number of candidate descriptions to be returned. The default is 1.
+   * Maximum number of candidate descriptions to be returned. The default is 1.
+   * @var {number} 
    */
-  maxCandidates?: number
+  maxCandidates?: number;
   /**
-   * @var {AnalyzeDetails[]} language Array of optional domain-specific details
+   * Language the descriptions should be generated in.
+   * @var {AnalyzeDetails[]} 
    */
-  language?: Language;
+  language?: visEnums.Language;
 }
-/**@interface ICongnitiveRequest Request sent to analyze image requests */
-export interface IAnalyzeImageRequest extends ICongnitiveRequest {
+/**
+ * Options that can be passed to the Analyze Image operation
+ * @interface
+ */
+export interface IAnalyzeImageRequest extends ICognitiveRequest {
   /**
    * Array of visual features to process.
    * @var {VisualFeatures[]} 
    */
-  visualFeatures?: VisualFeature[];
+  visualFeatures?: visEnums.VisualFeature[];
   /**
    * Array of optional domain-specific details
    * @var {AnalyzeDetails[]}
    */
-  details?: AnalyzeDetail[];
+  details?: visEnums.AnalyzeDetail[];
   /**
    * Array of optional domain-specific details
    * @var {AnalyzeDetails[]}
    */
-  language?: Language;
+  language?: visEnums.Language;
 }
-/**@interface ICongnitiveRequest Response returned by area of interest API */
+/**
+ * Describes the object returned by an Area of Interest operation.
+ * @interface 
+ */
 export interface IAreaOfInterestResponseData extends ICongnitiveResponseData {
-  /** @var {IRect} areaOfInterest Bounding rectangle of the area of interest. */
+  /**
+   * Bounding rectangle of the identified area of interest
+   * @var {IRect}
+   */
   areaOfInterest: IRect;
 }
 
-/**@interface ICongnitiveRequest Response returned by area of interest API */
-export interface ITagImageRequest extends ICongnitiveRequest {
+/**
+ * Describes options passed to a Tag Image operation.
+ * @interface 
+ */
+export interface ITagImageRequest extends ICognitiveRequest {
   /**
-   * @var {Language} language Optional language tags should be computed in.
+   * Optionally specify the language tags should be computed in.
+   * @var {Language} 
    */
-  language?: Language;
+  language?: visEnums.Language;
 }
-/**@interface ICongnitiveRequest Response returned by area of interest API */
+/**
+ * Describes the object returned by a Tag Image operation.
+ * @interface
+ */
 export interface ITagImageResponseData extends ICongnitiveResponseData {
   /**
-   * @var {IImageTag[]} tags Array of tags that can be applied to this image.
+   * Array of tags that can be applied to this image.
+   * @var {IImageTag[]} 
    */
   tags: IImageTag[];
 }
