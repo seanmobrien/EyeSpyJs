@@ -89,3 +89,13 @@ export enum LineDrawingType {
     /** Image is a line drawing */
     LineDrawing = 1
 }
+/**
+ * Status of a Read operation
+ * @enum {number}
+ */
+export enum GetReadResultStatus {
+    NotStarted = "notStarted",
+    Running = "running",
+    Failed = "failed",
+    Succeeded = "succeeded"
+}

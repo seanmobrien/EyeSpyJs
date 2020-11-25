@@ -60,7 +60,7 @@ router.post('/frame', (req, res) => {
             data: result
         });
     }).catch((err) => {
-        debug("error!", err);
+        debug('error!', err);
     });
 });
 router.post('/detect', (req, res) => {
@@ -85,7 +85,7 @@ router.post('/describe', (req, res) => {
             data: result
         });
     }).catch((err) => {
-        debug("error!", err);
+        debug('error!', err);
     });
 });
 router.post('/area-of-interest', (req, res) => {
@@ -97,7 +97,7 @@ router.post('/area-of-interest', (req, res) => {
             data: result
         });
     }).catch((err) => {
-        debug("error!", err);
+        debug('error!', err);
     });
 });
 router.post('/tag', (req, res) => {
@@ -108,7 +108,35 @@ router.post('/tag', (req, res) => {
             data: result
         });
     }).catch((err) => {
-        debug("error!", err);
+        debug('error!', err);
+    });
+});
+router.get('/read/:id', (req, res) => {
+    msVis.getReadResult(req.params.id)
+        .then((result) => {
+        res.json({
+            status: true,
+            message: 'Successfully scraped frame',
+            data: result
+        });
+    }).catch((err) => {
+        debug('error!', err);
+        res.send({
+            status: false,
+            message: 'Successfully uploaded image for further processing',
+            data: err
+        });
+    });
+});
+router.post('/read', (req, res) => {
+    passThroughService(req, res, msVis.postReadResult).then((result) => {
+        res.json({
+            status: true,
+            message: 'Successfully uploaded image for further processing',
+            opId: result
+        });
+    }).catch((err) => {
+        debug('error!', err);
     });
 });
 exports.default = router;

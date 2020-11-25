@@ -429,3 +429,118 @@ export interface ITagImageResponseData extends ICongnitiveResponseData {
    */
   tags: IImageTag[];
 }
+
+/**
+ * Base interface used to describe read response text results.
+ * @interface;
+ */
+export interface IReadResponseAnalyzeReadTextBase {
+    /**
+     * An array of numbers identifying the bounding box of the detected text.
+     * @var {number[]}
+     */
+    boundingBox: number[];
+    /**
+     * The actual detected text
+     * @var {string}
+     */
+    text: string;
+}
+/**
+ * Describes the parts (words) that make up a line of detected text.
+ * @interface;
+ */
+export interface IReadResponseAnalyzeReadTextResult extends IReadResponseAnalyzeReadTextBase {
+    /**
+     * The degree of confidence in this match.
+     * @var {number}
+     */
+    confidence: number;
+}
+/**
+ * Describes a line of text detected within an image.
+ * @interface;
+ */
+export interface IReadResponseAnalyzeReadLineResult extends IReadResponseAnalyzeReadTextBase {
+    /**
+     * Individual words within the line.
+     */
+    words: IReadResponseAnalyzeReadTextResult[];
+}
+/**
+ * Describes a page of text detected within an image.
+ * @interface
+ */
+export interface IReadResponseAnalyzeReadResult {
+    /**
+     * The page number
+     * @var {number}
+     */
+    page: number;
+    /**
+    * The detected language 
+    * @var {visEnums.Language}
+    */
+    language: visEnums.Language;
+    /**
+    * The angle the text is at
+    * @var {number}
+    */
+    angle: number;
+    /**
+     * The page width 
+     * @var {number}
+     */
+    width: number;
+    /**
+     * The page height
+     * @var {number}
+     */
+    height: number;
+    /**
+     * The unit of measurement used to describe width and height
+     * @var {string}
+     */
+    unit: string;
+    /**
+     * The lines making up this page.
+     * @var {IReadResponseAnalyzeReadLineResult[]}
+     */
+    lines: IReadResponseAnalyzeReadLineResult[];
+}
+
+export interface IReadResponseAnalyzeResult {
+    /**
+     * Response version
+     * @var {string}
+     */
+    version: string;
+    /**
+     * Parsed read results
+     * @var {IReadResponseAnalyzeReadResult[]}
+     */
+    readResults: IReadResponseAnalyzeReadResult[];
+}
+
+export interface IReadResponseData {
+    /**
+     * Operation Status
+     * @var {visEnums.GetReadResultStatus}
+     */
+    status: visEnums.GetReadResultStatus;
+    /**
+     * When the read operation began
+     * @var {Date}
+     */
+    createdDateTime: Date;
+    /**
+     * When the read operation was last updated.
+     * @var {visEnums.GetReadResultStatus}
+     */
+    lastUpdatedDateTime: Date;
+    /**
+     * If status is success this member will contain analyzed result.
+     * @var {IReadReponseAnalyzeResult}
+     */
+    analyzeResult?: IReadResponseAnalyzeResult;
+}

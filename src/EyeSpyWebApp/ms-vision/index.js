@@ -19,7 +19,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.tagImage = exports.describeImage = exports.areaOfInterest = exports.detectObjects = exports.analyzeImage = void 0;
+exports.postReadResult = exports.getReadResult = exports.tagImage = exports.describeImage = exports.areaOfInterest = exports.detectObjects = exports.analyzeImage = void 0;
 // External libraries
 //import * as _ from 'lodash';
 const _ = require('lodash');
@@ -182,4 +182,43 @@ function tagImage(ops) {
     });
 }
 exports.tagImage = tagImage;
+/**
+ * This operation checks for the result of an earlier uploaded Read operation.
+ * @param {string} operationId The operation id returned when the operation began.
+ * @returns {visTypes.IReadResponseData} Structured data extracted from image.
+ */
+function getReadResult(operationId) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const resp = yield _sa.get(makeVisionApi('vision/v3.0/read/analyzeResults/' + operationId))
+                .set(visEnums.HttpHeader.MsApiSubscription, secrets.msVision.key);
+            return resp.body;
+        }
+        catch (err) {
+            throw handleCognitiveFail('analyze-image', err);
+        }
+    });
+}
+exports.getReadResult = getReadResult;
+/**
+ * This operation checks for the result of an earlier uploaded Read operation.
+ * @param {visTypes.ITagImageRequest} ops The operation id returned when the operation began.
+ * @returns {string} Structured data extracted from image.
+ */
+function postReadResult(ops) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const reqParams = {};
+            if (ops.language) {
+                reqParams['language'] = ops.language.toString();
+            }
+            const resp = yield callCognitiveApi('vision/v3.0/read/analyze', ops.data, reqParams);
+            return resp.headers['apim-request-id'];
+        }
+        catch (err) {
+            throw handleCognitiveFail('analyze-image', err);
+        }
+    });
+}
+exports.postReadResult = postReadResult;
 //# sourceMappingURL=index.js.map

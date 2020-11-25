@@ -155,3 +155,35 @@ export async function tagImage(ops: visTypes.ITagImageRequest) {
     throw handleCognitiveFail('analyze-image', err);
   }
 }
+/**
+ * This operation checks for the result of an earlier uploaded Read operation.
+ * @param {string} operationId The operation id returned when the operation began.
+ * @returns {visTypes.IReadResponseData} Structured data extracted from image.
+ */
+export async function getReadResult(operationId: string) {
+    try {
+        const resp = await _sa.get(makeVisionApi('vision/v3.0/read/analyzeResults/' + operationId))
+            .set(visEnums.HttpHeader.MsApiSubscription, secrets.msVision.key);
+        return resp.body as visTypes.IReadResponseData;
+    } catch (err) {
+        throw handleCognitiveFail('analyze-image', err);
+    }
+}
+/**
+ * This operation checks for the result of an earlier uploaded Read operation.
+ * @param {visTypes.ITagImageRequest} ops The operation id returned when the operation began.
+ * @returns {string} Structured data extracted from image.
+ */
+export async function postReadResult(ops: visTypes.ITagImageRequest) {
+    try {
+        const reqParams: { [key: string]: string; } = {};
+
+        if (ops.language) {
+            reqParams['language'] = ops.language.toString();
+        }
+        const resp = await callCognitiveApi('vision/v3.0/read/analyze', ops.data, reqParams);
+        return resp.headers['apim-request-id'] as string;
+    } catch (err) {
+        throw handleCognitiveFail('analyze-image', err);
+    }
+}

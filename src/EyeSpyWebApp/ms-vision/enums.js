@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.LineDrawingType = exports.ClipartType = exports.AnalyzeDetail = exports.Language = exports.VisualFeature = exports.ContentType = exports.HttpHeader = void 0;
+exports.GetReadResultStatus = exports.LineDrawingType = exports.ClipartType = exports.AnalyzeDetail = exports.Language = exports.VisualFeature = exports.ContentType = exports.HttpHeader = void 0;
 /**
  * Available visual features for analysis
  * @enum {string}
@@ -97,4 +97,15 @@ var LineDrawingType;
     /** Image is a line drawing */
     LineDrawingType[LineDrawingType["LineDrawing"] = 1] = "LineDrawing";
 })(LineDrawingType = exports.LineDrawingType || (exports.LineDrawingType = {}));
+/**
+ * Status of a Read operation
+ * @enum {number}
+ */
+var GetReadResultStatus;
+(function (GetReadResultStatus) {
+    GetReadResultStatus["NotStarted"] = "notStarted";
+    GetReadResultStatus["Running"] = "running";
+    GetReadResultStatus["Failed"] = "failed";
+    GetReadResultStatus["Succeeded"] = "succeeded";
+})(GetReadResultStatus = exports.GetReadResultStatus || (exports.GetReadResultStatus = {}));
 //# sourceMappingURL=enums.js.map
