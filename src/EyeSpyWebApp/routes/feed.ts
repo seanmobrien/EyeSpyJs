@@ -1,23 +1,25 @@
 /*
  * POST image feed.
  */
-import express = require('express');
-import debug = require('debug');
 
-import { analyzeImage, detectObjects, VisualFeature } from '../ms-vision/';
+import * as express from 'express';
+import * as debugFactory from 'debug';
+
+const debug = debugFactory('feed');
+
+import * as msVis from '../ms-vision/';
+
 
 const router = express.Router();
 
-import secrets = require('../secrets.json');
-
-
-type ServiceCallback = (data: number[]) => Promise<any>;
+type ServiceCallback = (request: msVis.ICognitiveRequest) => Promise<any>;
 
 
 function passThroughService(req: express.Request, res: express.Response, callService: ServiceCallback) {
     const files = req['files'];
+
     if (!files || Object.keys(files).length === 0) {
-        res.send(<any>{
+        res.json(<any>{
             status: false,
             message: 'No file uploaded'
         });
@@ -32,52 +34,130 @@ function passThroughService(req: express.Request, res: express.Response, callSer
             return Promise.reject();
         } else {
             // Extract the first uploaded file 
-            const frame = files[keys[0]];
+          const frame = files[keys[0]];          
             // Pass to callService callback
-            return callService(frame.data as number[])
+          return callService({ data: frame.data as Uint8Array })
                 // Process fail by default
-                .catch((err) => { res.status(err.statusCode).send(err); });
+                .catch((err) => {
+                    debug('An unexpected failure occurred while processing a pass-through service request.', err);
+                    res.status(err.statusCode).send(err);
+                });
         }
     }
 }
 
-
 router.get('/', (req: any, res: express.Response) => {
-  res.send(<string>'Feed server is active');
+  res.send(<any>'Feed server is active');
 });
 
 
-router.post('/frame', (req: /*express.Request*/any, res: express.Response) => {
-    passThroughService(req,  res,  (data: number[]) => {
-        return analyzeImage({
-            data: data,
+router.post('/frame', (req: any, res: express.Response) => {
+    passThroughService(req, res, (r: msVis.ICognitiveRequest) => {
+        return msVis.analyzeImage({
+            data: r.data,
             visualFeatures: [
-                VisualFeature.Categories,
-                VisualFeature.Description,
-                VisualFeature.Objects,
-                VisualFeature.Faces
+                msVis.VisualFeature.Categories,
+                msVis.VisualFeature.Description,
+                msVis.VisualFeature.Objects,
+                msVis.VisualFeature.Faces
             ]
         });
     }).then((result) => {
-        res.send(<any>{
+        res.json(<any>{
             status: true,
             message: 'Successfully scraped frame',
             data: result
         });
     }).catch((err) => {
-        debug("error!" + err);
+        debug('error!', err);
     });
 });
 
-router.post('/detect', (req: /*express.Request*/any, res: express.Response) => {
-    passThroughService(req, res, (data: number[]) => detectObjects(data)).then((result) => {
-        res.send(<any>{
+router.post('/detect', (req: any, res: express.Response) => {
+    passThroughService(req, res, msVis.detectObjects).then((result) => {
+        res.json(<any>{
             status: true,
             message: 'Successfully scraped frame',
             data: result
         });
     });
 });
+
+router.post('/describe', (req: any, res: express.Response) => {
+    passThroughService(req, res, (r: msVis.ICognitiveRequest) => {
+    return msVis.describeImage({
+      data: r.data,
+      maxCandidates: 3
+    });
+  }).then((result) => {
+      res.json(<any>{
+      status: true,
+      message: 'Successfully scraped frame',
+      data: result
+    });
+  }).catch((err) => {
+    debug('error!', err);
+  });
+});
+
+router.post('/area-of-interest', (req: any, res: express.Response) => {
+  passThroughService(req, res, msVis.areaOfInterest)
+    .then((result) => {
+        res.json(<any>{
+        status: true,
+        message: 'Successfully scraped frame',
+        data: result
+      });
+  }).catch((err) => {
+    debug('error!', err);
+  });
+});
+
+
+router.post('/tag', (req: any, res: express.Response) => {
+  passThroughService(req, res, msVis.tagImage).then((result) => {
+    res.json(<any>{
+      status: true,
+      message: 'Successfully scraped frame',
+      data: result
+    });
+  }).catch((err) => {
+    debug('error!', err);
+  });
+});
+
+router.get('/read/:id', (req: any, res: express.Response) => {
+
+    msVis.getReadResult(req.params.id)
+        .then((result) => {
+            res.json(<any>{
+                status: true,
+                message: 'Successfully scraped frame',
+                data: result
+            });
+        }).catch((err) => {
+            debug('error!', err);
+            res.send(<any>{
+                status: false,
+                message: 'Successfully uploaded image for further processing',
+                data: err
+            });
+        });
+});
+
+router.post('/read', (req: any, res: express.Response) => {
+    passThroughService(req, res, msVis.postReadResult).then((result) => {
+        res.json(<any>{
+            status: true,
+            message: 'Successfully uploaded image for further processing',
+            opId: result
+        });
+    }).catch((err) => {
+        debug('error!', err);
+    });
+});
+
+
 
 
 

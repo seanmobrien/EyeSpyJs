@@ -1,16 +1,16 @@
-// Import enum definitions
-import { VisualFeature, AnalyzeDetail, Language, HttpHeader, ContentType } from './enums';
-// re-export enums needed to call apis
-export { VisualFeature, AnalyzeDetail, Language };
-// Import interface definitions
-import { IAnalyzeImageResponseData, IDetectObjectsResponseData  } from './ifaces';
-// re-export enums needed to call apis
-export { IAnalyzeImageResponseData, IDetectObjectsResponseData };
-
-const debug = require('debug');
+// External libraries
+//import * as _ from 'lodash';
 const _ = require('lodash');
-const secrets = require('../secrets.json');
+//import * as _sa from 'superagent';
 const _sa = require('superagent');
+// Import/Export enums
+import * as visEnums from './enums';
+export * from './enums';
+// Import/Export interfaces
+import * as visTypes from './ifaces';
+export * from './ifaces';
+// Secrets
+const secrets = require('../secrets.json');
 
 function makeVisionApi(api: string, args: { [key: string]: string; } = null) {
     let params = '?';
@@ -51,43 +51,22 @@ function handleCognitiveFail(method: string, err: Error) {
  * @param {number[]} data Byte array containing image to process.
  * @param {{[key: string]: string;}} reqParams
  */
-async function callCognitiveApi(serviceUri: string, data: number[], reqParams: { [key: string]: string; } = { }) {
+async function callCognitiveApi(serviceUri: string, data: Uint8Array, reqParams: { [key: string]: string; } = { }) {
     const uri = makeVisionApi(serviceUri, reqParams);
 
     return await _sa.post(uri)
-        .set(HttpHeader.ContentType, ContentType.OctetStream)
-        .set(HttpHeader.MsApiSubscription, secrets.msVision.key)
+        .set(visEnums.HttpHeader.ContentType, visEnums.ContentType.OctetStream)
+        .set(visEnums.HttpHeader.MsApiSubscription, secrets.msVision.key)
         .send(data);
 }
 
 
 /**
- * 
- * @param {IAnalyzeImageOptions} ops Image analyze options
- * @returns {IAnalyzeImageResponseData} Structured data extracted from image.
+ * This operation extracts a rich set of visual features based on the image content.
+ * @param {visTypes.IAnalyzeImageRequest} ops Image analyze options
+ * @returns {visTypes.IAnalyzeImageResponseData} Structured data extracted from image.
  */
-export async function analyzeImage(ops: {
-    /**
-     * Image data
-     * @var {number[]} 
-     */
-    data: number[];
-    /**
-     * Array of visual features to process.
-     * @var {VisualFeatures[]} 
-     */
-    visualFeatures?: VisualFeature[];
-    /**
-     * Array of optional domain-specific details
-     * @var {AnalyzeDetails[]}
-     */
-    details?: AnalyzeDetail[];
-    /**
-     * Array of optional domain-specific details
-     * @var {AnalyzeDetails[]}
-     */
-    language?: Language;
-}) {
+export async function analyzeImage(ops: visTypes.IAnalyzeImageRequest) {
     try {
         const reqParams: { [key: string]: string; } = {};
         
@@ -100,32 +79,111 @@ export async function analyzeImage(ops: {
         if (ops.language) {
             reqParams['language'] = ops.language.toString();
         }
-        /*
-        const uri = makeVisionApi('vision/v3.1/analyze', reqParams);
-
-        const resp = await _sa.post(uri)
-            .set(HttpHeader.ContentType, ContentType.OctetStream)
-            .set(HttpHeader.MsApiSubscription, secrets.msVision.key)
-            .send(ops.data);
-        */
         const resp = await callCognitiveApi('vision/v3.1/analyze', ops.data, reqParams);
-
-        return resp.body as IAnalyzeImageResponseData;
+        return resp.body as visTypes.IAnalyzeImageResponseData;
     } catch (err) {
         throw handleCognitiveFail('analyze-image', err);
     }
 }
 
 /**
- * @function Detects objects within an image.
- * @param {number[]} data Array of bytes containing image binary data.
- * @returns {IDetectObjectsResponseData} Structured data extracted from image.
+ * This operation Performs object detection on the specified image.
+ * @param {visTypes.ICognitiveRequest} request Image data.
+ * @returns {visTypes.IDetectObjectsResponseData} Structured data extracted from image.
  */
-export async function detectObjects(data: number[]) {
+export async function detectObjects(request: visTypes.ICognitiveRequest) {
     try {
-        const resp = await callCognitiveApi('vision/v3.0/detect', data);
-        return resp.body as IDetectObjectsResponseData;
+        const resp = await callCognitiveApi('vision/v3.0/detect', request.data);
+        return resp.body as visTypes.IDetectObjectsResponseData;
     } catch (err) {
         throw handleCognitiveFail('detectObjects', err);
+    }
+}
+
+/**
+ * This operation returns a bounding box around the most important area of the image.
+ * @param {visTypes.ICognitiveRequest} request Image data.
+ * @returns {visTypes.IAreaOfInterestResponseData} Structured data extracted from image.
+ */
+export async function areaOfInterest(request: visTypes.ICognitiveRequest) {
+  try {
+    const resp = await callCognitiveApi('vision/v3.0/areaOfInterest', request.data);
+    return resp.body as visTypes.IAreaOfInterestResponseData;
+  } catch (err) {
+    throw handleCognitiveFail('areaOfInterest', err);
+  }
+}
+
+/**
+ * This operation generates a description of an image in human readable language with complete sentences. The description is based on a collection of content tags, which are also returned by the operation. More than one description can be generated for each image. Descriptions are ordered by their confidence score. All descriptions are in English
+ * @param {visTypes.IDescribeImageRequest} ops Image analyze options
+ * @returns {visTypes.IDescribeImageResponseData} Structured data extracted from image.
+ */
+export async function describeImage(ops: visTypes.IDescribeImageRequest) {
+  try {
+    const reqParams: { [key: string]: string; } = {};
+
+    if (ops.maxCandidates && ops.maxCandidates > 0) {
+      reqParams['maxCandidates'] = ops.maxCandidates.toString();
+    }
+    if (ops.language) {
+      reqParams['language'] = ops.language.toString();
+    }
+
+    const resp = await callCognitiveApi('vision/v3.0/describe', ops.data, reqParams);
+    return resp.body as visTypes.IDescribeImageResponseData;
+  } catch (err) {
+    throw handleCognitiveFail('analyze-image', err);
+  }
+}
+
+/**
+ * This operation extracts a rich set of visual features based on the image content.
+ * @param {visTypes.IAnalyzeImageRequest} ops Image analyze options
+ * @returns {visTypes.IAnalyzeImageResponseData} Structured data extracted from image.
+ */
+export async function tagImage(ops: visTypes.ITagImageRequest) {
+  try {
+    const reqParams: { [key: string]: string; } = {};
+
+    if (ops.language) {
+      reqParams['language'] = ops.language.toString();
+    }
+    const resp = await callCognitiveApi('vision/v3.0/tag', ops.data, reqParams);
+    return resp.body as visTypes.ITagImageResponseData;
+  } catch (err) {
+    throw handleCognitiveFail('analyze-image', err);
+  }
+}
+/**
+ * This operation checks for the result of an earlier uploaded Read operation.
+ * @param {string} operationId The operation id returned when the operation began.
+ * @returns {visTypes.IReadResponseData} Structured data extracted from image.
+ */
+export async function getReadResult(operationId: string) {
+    try {
+        const resp = await _sa.get(makeVisionApi('vision/v3.0/read/analyzeResults/' + operationId))
+            .set(visEnums.HttpHeader.MsApiSubscription, secrets.msVision.key);
+        return resp.body as visTypes.IReadResponseData;
+    } catch (err) {
+        throw handleCognitiveFail('analyze-image', err);
+    }
+}
+/**
+ * This operation checks for the result of an earlier uploaded Read operation.
+ * @param {visTypes.ITagImageRequest} ops The operation id returned when the operation began.
+ * @returns {string} Structured data extracted from image.
+ */
+export async function postReadResult(ops: visTypes.ITagImageRequest) {
+    try {
+        const reqParams: { [key: string]: string; } = {};
+
+        if (ops.language) {
+            reqParams['language'] = ops.language.toString();
+        }
+        const resp = await callCognitiveApi('vision/v3.0/read/analyze', ops.data, reqParams);
+        return resp.headers['apim-request-id'] as string;
+    } catch (err) {
+        throw handleCognitiveFail('analyze-image', err);
     }
 }

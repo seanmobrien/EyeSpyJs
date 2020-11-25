@@ -19,26 +19,39 @@ export enum ContentType {
  * @enum {string}
  */
 export enum VisualFeature {
-    /** @var */
+    /** Adult Content Detection */
     Adult = 'Adult',
+    /** Brand Detection */
     Brands = 'Brands',
+    /** Categorization */
     Categories = 'Categories',
+    /** Color classification */
     Color = 'Color',
+    /** Image Description */
     Description = 'Description',
+    /** Face detection  */
     Faces = 'Faces',
+    /** Image Type Detection  */
     ImageType = 'ImageType',
+    /** Object Detection  */
     Objects = 'Objects',
+    /** Image tagging  */
     Tags = 'Tags'
 }
 /**
  * Available Languages
  * @enum {string}
  */
-export enum Language {
+export enum Language  {
+    /** English */
     English = 'en',
+    /** Spanish */
     Spanish = 'es',
+    /** Japanese */
     Japanese = 'ja',
+    /** Portuguese */
     Portuguese = 'pt',
+    /** SimplifiedChinese */
     SimplifiedChinese = 'zh'
 }
 /**
@@ -46,7 +59,9 @@ export enum Language {
  * @enum {string}
  */
 export enum AnalyzeDetail {
+    /** Celebrity  */
     Celebrities = 'Celebrities',
+    /** Landmark */
     Landmarks = 'Landmarks'
 }
 
@@ -55,9 +70,13 @@ export enum AnalyzeDetail {
  * @enum {number}
  */
 export enum ClipartType {
+    /** Not clip art */
     NonClipart = 0,
+    /** Unable to determine */
     Ambiguous = 1,
+    /** Passable as clip art */
     Normal = 2,
+    /** High-quality clip art */
     Good = 3
 }
 /**
@@ -65,6 +84,18 @@ export enum ClipartType {
  * @enum {number}
  */
 export enum LineDrawingType {
+    /** Image is not a line drawing */
     NonLineDrawing = 0,
+    /** Image is a line drawing */
     LineDrawing = 1
+}
+/**
+ * Status of a Read operation
+ * @enum {number}
+ */
+export enum GetReadResultStatus {
+    NotStarted = "notStarted",
+    Running = "running",
+    Failed = "failed",
+    Succeeded = "succeeded"
 }
