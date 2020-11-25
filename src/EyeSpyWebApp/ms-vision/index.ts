@@ -1,4 +1,5 @@
 // Import enum definitions
+
 import { VisualFeature, AnalyzeDetail, Language, HttpHeader, ContentType } from './enums';
 // re-export enums needed to call apis
 export { VisualFeature, AnalyzeDetail, Language };
@@ -7,7 +8,6 @@ import { IDetectObjectsResponseData, ICongnitiveRequest, IAnalyzeImageRequest, I
 // re-export enums needed to call apis
 export { ICongnitiveRequest, IDetectObjectsResponseData, IAnalyzeImageRequest, IAnalyzeImageResponseData, IDescribeImageRequest, IDescribeImageResponseData, IAreaOfInterestResponseData, ITagImageRequest, ITagImageResponseData };
 
-const debug = require('debug');
 const _ = require('lodash');
 const secrets = require('../secrets.json');
 const _sa = require('superagent');

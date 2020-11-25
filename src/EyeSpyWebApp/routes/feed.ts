@@ -8,9 +8,6 @@ import { analyzeImage, detectObjects, VisualFeature, ICongnitiveRequest, describ
 
 const router = express.Router();
 
-import secrets = require('../secrets.json');
-
-
 type ServiceCallback = (request: ICongnitiveRequest) => Promise<any>;
 
 
@@ -58,7 +55,7 @@ router.post('/frame', (req: any, res: express.Response) => {
             ]
         });
     }).then((result) => {
-        res.send(<any>{
+        res.json({
             status: true,
             message: 'Successfully scraped frame',
             data: result
@@ -70,7 +67,7 @@ router.post('/frame', (req: any, res: express.Response) => {
 
 router.post('/detect', (req: any, res: express.Response) => {
   passThroughService(req, res, detectObjects).then((result) => {
-        res.send(<any>{
+        res.json({
             status: true,
             message: 'Successfully scraped frame',
             data: result
@@ -85,7 +82,7 @@ router.post('/describe', (req: any, res: express.Response) => {
       maxCandidates: 3
     });
   }).then((result) => {
-    res.send(<any>{
+    res.json({
       status: true,
       message: 'Successfully scraped frame',
       data: result
@@ -98,7 +95,7 @@ router.post('/describe', (req: any, res: express.Response) => {
 router.post('/area-of-interest', (req: any, res: express.Response) => {
   passThroughService(req, res, areaOfInterest)
     .then((result) => {
-      res.send(<any>{
+      res.json({
         status: true,
         message: 'Successfully scraped frame',
         data: result
@@ -111,7 +108,7 @@ router.post('/area-of-interest', (req: any, res: express.Response) => {
 
 router.post('/tag', (req: any, res: express.Response) => {
   passThroughService(req, res, tagImage).then((result) => {
-    res.send(<any>{
+    res.json({
       status: true,
       message: 'Successfully scraped frame',
       data: result

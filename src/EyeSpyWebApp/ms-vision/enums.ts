@@ -68,3 +68,13 @@ export enum LineDrawingType {
     NonLineDrawing = 0,
     LineDrawing = 1
 }
+
+export default {
+  HttpHeader: HttpHeader;
+  ContentType: ContentType;
+  VisualFeature: VisualFeature;
+  Language: Language;
+  AnalyzeDetail: AnalyzeDetail;
+  ClipartType: ClipartType;
+  LineDrawingType: LineDrawingType;
+};
