@@ -1,3 +1,6 @@
+import { VisualFeature, AnalyzeDetail, Language, HttpHeader, ContentType } from './enums';
+
+
 /**
  * Interface shared by tagged data.
  * @interface {IImageTag}
@@ -10,8 +13,7 @@ export interface IImageTag {
 }
 
 /**
- * Rectangle
- * @interface 
+ * @interface IRectangle rectangle with verbose property names.
  */
 export interface IRectangle {
     /**
@@ -35,6 +37,33 @@ export interface IRectangle {
      */
     height: number;
 }
+/**
+ * @interface IRectangle rectangle with abbreviated property names.
+ */
+export interface IRect {
+  /**
+   * Left-most point
+   * @var {number}
+   */
+  x: number;
+  /**
+   * Top-most point
+   * @var {number}
+   */
+  y: number;
+  /**
+   * Width
+   * @var {number}
+   */
+  w: number;
+  /**
+   * Height
+   * @var {number}
+   */
+  h: number;
+}
+
+
 /** @interface IImageCategory<TDetail> contains an abstract image category result. */
 export interface IImageCategory<TDetail> {
     /** @var {string} name Category Name */
@@ -104,36 +133,15 @@ export interface IDetectedObjectBase {
      */
     confidence: number;
 }
+
+
 export interface IDetectedObject extends IDetectedObjectBase {
     /**
-     * The bounding rectangle the object was detected within.
-     * @var { { x:number; y:number; w: number; h: number; } }
+     * @var {IRect} rectangle The bounding rectangle the object was detected within.
      */
-    rectangle: {
-        /**
-         * Left-most point
-         * @var {number}
-         */
-        x: number;
-        /**
-         * Top-most point
-         * @var {number}
-         */
-        y: number;
-        /**
-         * Width
-         * @var {number}
-         */
-        w: number;
-        /**
-         * Height
-         * @var {number}
-         */
-        h: number;
-    };
+    rectangle: IRect;
     /**
-     * Optional parent to this object.
-     * @var {IDetectedObjectBase}
+     * @var {IDetectedObjectBase} parent Optional parent to this object.
      */
     parent?: IDetectedObjectBase;
 }
@@ -158,30 +166,56 @@ export interface IDetectedFace {
      */
     faceRectangle: IRectangle;
 }
+/** 
+ * @interface IImageDescription IDetectedFace interface is used to describe an image.
+ */
+export interface IImageDescription {
+  /** @var {string[]} tags Array of tags describing the image */
+  tags?: string[];
+  /** @var {IImageCaption} Image captions */
+  captions?: {
+    /** @var {string} text Caption text */
+    text: string;
+    /** @var {confidence} score Probability this caption is applicable */
+    confidence: number;
+  }[];
+}
+
+
+export interface ICongnitiveResponseData {
+  /**
+ * Metadata describing the source image.
+ * @var {IImageMetadata}
+ */
+  metadata?: IImageMetadata;
+  /**
+  * Unique request identifier.
+  * @var {string}
+  */
+  requestId: string;
+}
 
 
 /**
  * Interface describing detectObjects return value.
  * @interface
  */
-export interface IDetectObjectsResponseData {
-    /**
-     * Metadata describing the source image.
-     * @var {IImageMetadata}
-     */
-    metadata?: IImageMetadata;
+export interface IDetectObjectsResponseData extends ICongnitiveResponseData {
+
     /**
      * Array of detected object data.
      * @var {IDetectedObject[]}
      */
     objects?: IDetectedObject[];
-    /**
-     * Unique request identifier.
-     * @var {string}
-     */
-    requestId: string;
-}
 
+}
+/** @interface IDescribeImageResponseData Describe image API response. */
+export interface IDescribeImageResponseData extends ICongnitiveResponseData {
+  /**
+   * @var description Description of the image.
+   */
+  description: IImageDescription;
+}
 /**
  * Interface describing analyzeImage return value.
  * @interface IAnalyzeImageResponseData
@@ -244,19 +278,9 @@ export interface IAnalyzeImageResponseData extends IDetectObjectsResponseData {
         isBWImg: boolean;
     };
     /**
-     * Description of the image.
+     * @var description Description of the image.
      */
-    description?: {
-        /** @var {string[]} tags Array of tags describing the image */
-        tags?: string[];
-        /** @var {IImageCaption} Image captions */
-        captions?: {
-            /** @var {string} text Caption text */
-            text: string;
-            /** @var {confidence} score Probability this caption is applicable */
-            confidence: number;
-        }[];
-    };
+    description?: IImageDescription;
     /**
      * Array of tags that can be applied to this image.
      * @var {IImageTag[]}
@@ -267,4 +291,62 @@ export interface IAnalyzeImageResponseData extends IDetectObjectsResponseData {
      * @var {IDetectedFace[]}
      */
     faces?: IDetectedFace[];
+}
+
+/**@interface ICongnitiveRequest Common properties shared by all cognitive requests */
+export interface ICongnitiveRequest {
+  /**  
+  * @var {number[]} data binary image data.
+  */
+  data: number[];
+}
+
+/**@interface ICongnitiveRequest Request sent to analyze image requests */
+export interface IDescribeImageRequest extends ICongnitiveRequest {
+  /**
+   * @var {number} maxCandidates Maximum number of candidate descriptions to be returned. The default is 1.
+   */
+  maxCandidates?: number
+  /**
+   * @var {AnalyzeDetails[]} language Array of optional domain-specific details
+   */
+  language?: Language;
+}
+/**@interface ICongnitiveRequest Request sent to analyze image requests */
+export interface IAnalyzeImageRequest extends ICongnitiveRequest {
+  /**
+   * Array of visual features to process.
+   * @var {VisualFeatures[]} 
+   */
+  visualFeatures?: VisualFeature[];
+  /**
+   * Array of optional domain-specific details
+   * @var {AnalyzeDetails[]}
+   */
+  details?: AnalyzeDetail[];
+  /**
+   * Array of optional domain-specific details
+   * @var {AnalyzeDetails[]}
+   */
+  language?: Language;
+}
+/**@interface ICongnitiveRequest Response returned by area of interest API */
+export interface IAreaOfInterestResponseData extends ICongnitiveResponseData {
+  /** @var {IRect} areaOfInterest Bounding rectangle of the area of interest. */
+  areaOfInterest: IRect;
+}
+
+/**@interface ICongnitiveRequest Response returned by area of interest API */
+export interface ITagImageRequest extends ICongnitiveRequest {
+  /**
+   * @var {Language} language Optional language tags should be computed in.
+   */
+  language?: Language;
+}
+/**@interface ICongnitiveRequest Response returned by area of interest API */
+export interface ITagImageResponseData extends ICongnitiveResponseData {
+  /**
+   * @var {IImageTag[]} tags Array of tags that can be applied to this image.
+   */
+  tags: IImageTag[];
 }

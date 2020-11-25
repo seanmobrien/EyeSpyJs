@@ -4,14 +4,14 @@
 import express = require('express');
 import debug = require('debug');
 
-import { analyzeImage, detectObjects, VisualFeature } from '../ms-vision/';
+import { analyzeImage, detectObjects, VisualFeature, ICongnitiveRequest, describeImage, areaOfInterest, tagImage } from '../ms-vision/';
 
 const router = express.Router();
 
 import secrets = require('../secrets.json');
 
 
-type ServiceCallback = (data: number[]) => Promise<any>;
+type ServiceCallback = (request: ICongnitiveRequest) => Promise<any>;
 
 
 function passThroughService(req: express.Request, res: express.Response, callService: ServiceCallback) {
@@ -32,25 +32,24 @@ function passThroughService(req: express.Request, res: express.Response, callSer
             return Promise.reject();
         } else {
             // Extract the first uploaded file 
-            const frame = files[keys[0]];
+          const frame = files[keys[0]];          
             // Pass to callService callback
-            return callService(frame.data as number[])
+          return callService({ data: frame.data as number[] })
                 // Process fail by default
                 .catch((err) => { res.status(err.statusCode).send(err); });
         }
     }
 }
 
-
 router.get('/', (req: any, res: express.Response) => {
   res.send(<string>'Feed server is active');
 });
 
 
-router.post('/frame', (req: /*express.Request*/any, res: express.Response) => {
-    passThroughService(req,  res,  (data: number[]) => {
+router.post('/frame', (req: any, res: express.Response) => {
+  passThroughService(req, res, (r: ICongnitiveRequest) => {
         return analyzeImage({
-            data: data,
+            data: r.data,
             visualFeatures: [
                 VisualFeature.Categories,
                 VisualFeature.Description,
@@ -69,8 +68,8 @@ router.post('/frame', (req: /*express.Request*/any, res: express.Response) => {
     });
 });
 
-router.post('/detect', (req: /*express.Request*/any, res: express.Response) => {
-    passThroughService(req, res, (data: number[]) => detectObjects(data)).then((result) => {
+router.post('/detect', (req: any, res: express.Response) => {
+  passThroughService(req, res, detectObjects).then((result) => {
         res.send(<any>{
             status: true,
             message: 'Successfully scraped frame',
@@ -79,6 +78,48 @@ router.post('/detect', (req: /*express.Request*/any, res: express.Response) => {
     });
 });
 
+router.post('/describe', (req: any, res: express.Response) => {
+  passThroughService(req, res, (r: ICongnitiveRequest) => {
+    return describeImage({
+      data: r.data,
+      maxCandidates: 3
+    });
+  }).then((result) => {
+    res.send(<any>{
+      status: true,
+      message: 'Successfully scraped frame',
+      data: result
+    });
+  }).catch((err) => {
+    debug("error!" + err);
+  });
+});
+
+router.post('/area-of-interest', (req: any, res: express.Response) => {
+  passThroughService(req, res, areaOfInterest)
+    .then((result) => {
+      res.send(<any>{
+        status: true,
+        message: 'Successfully scraped frame',
+        data: result
+      });
+  }).catch((err) => {
+    debug("error!" + err);
+  });
+});
+
+
+router.post('/tag', (req: any, res: express.Response) => {
+  passThroughService(req, res, tagImage).then((result) => {
+    res.send(<any>{
+      status: true,
+      message: 'Successfully scraped frame',
+      data: result
+    });
+  }).catch((err) => {
+    debug("error!" + err);
+  });
+});
 
 
 
