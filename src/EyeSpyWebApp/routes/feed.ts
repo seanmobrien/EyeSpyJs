@@ -8,7 +8,7 @@ import * as debugFactory from 'debug';
 const debug = debugFactory('feed');
 
 import * as msVis from '../ms-vision/';
-
+import * as feedManager from '../feed-manager';
 
 const router = express.Router();
 
@@ -72,6 +72,26 @@ router.post('/frame', (req: any, res: express.Response) => {
         debug('error!', err);
     });
 });
+
+router.post('/queue', async (req: any, res: express.Response) => {
+  const val = await feedManager.addFrame({ test: 'frame', data: 'here' });
+  res.json({
+    ok: true,
+    value: val
+  });
+  
+  /*
+  passThroughService(req, res, msVis.detectObjects).then((result) => {
+    res.json(<any>{
+      status: true,
+      message: 'Successfully scraped frame',
+      data: result
+    });
+  });
+  */
+});
+
+
 
 router.post('/detect', (req: any, res: express.Response) => {
     passThroughService(req, res, msVis.detectObjects).then((result) => {

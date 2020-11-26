@@ -7,6 +7,7 @@ const fileUpload = require("express-fileupload");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const morgan = require("morgan");
+const feedManager = require("./feed-manager");
 const index_1 = require("./routes/index");
 const user_1 = require("./routes/user");
 const feed_1 = require("./routes/feed");
@@ -54,7 +55,13 @@ app.use((err, req, res, next) => {
     });
 });
 app.set('port', process.env.PORT || 3000);
+feedManager.startupQueue();
 var server = app.listen(app.get('port'), function () {
-    debug('Express server listening on port ' + server.address().port);
+    /*
+    const addr = server.address() as AddressInfo;
+    debug('Express')('Express server listening on port ' + addr.port);
+    */
+    debug('Express')('Express server listening on ' + server.address().toString());
 });
+debug('app')('about to exit');
 //# sourceMappingURL=app.js.map

@@ -6,14 +6,13 @@ import cors = require('cors');
 import bodyParser = require('body-parser');
 import morgan = require('morgan');
 import _ = require('lodash');
-
+import * as feedManager from './feed-manager';
 
 import routes from './routes/index';
 import users from './routes/user';
 import feed from './routes/feed';
 
 var app = express();
-
 
 // enable files upload
 app.use(fileUpload({
@@ -68,6 +67,15 @@ app.use((err: any, req, res, next) => {
 
 app.set('port', process.env.PORT || 3000);
 
+
+feedManager.startupQueue();
+
 var server = app.listen(app.get('port'), function () {
-    debug('Express server listening on port ' + server.address().port);
+  /*
+  const addr = server.address() as AddressInfo; 
+  debug('Express')('Express server listening on port ' + addr.port);
+  */
+  debug('Express')('Express server listening on ' + server.address().toString());
 });
+
+debug('app')('about to exit');

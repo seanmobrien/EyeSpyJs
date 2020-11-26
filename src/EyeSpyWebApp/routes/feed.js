@@ -2,11 +2,21 @@
 /*
  * POST image feed.
  */
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const express = require("express");
 const debugFactory = require("debug");
 const debug = debugFactory('feed');
 const msVis = require("../ms-vision/");
+const feedManager = require("../feed-manager");
 const router = express.Router();
 function passThroughService(req, res, callService) {
     const files = req['files'];
@@ -63,6 +73,22 @@ router.post('/frame', (req, res) => {
         debug('error!', err);
     });
 });
+router.post('/queue', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const val = yield feedManager.addFrame({ test: 'frame', data: 'here' });
+    res.json({
+        ok: true,
+        value: val
+    });
+    /*
+    passThroughService(req, res, msVis.detectObjects).then((result) => {
+      res.json(<any>{
+        status: true,
+        message: 'Successfully scraped frame',
+        data: result
+      });
+    });
+    */
+}));
 router.post('/detect', (req, res) => {
     passThroughService(req, res, msVis.detectObjects).then((result) => {
         res.json({
